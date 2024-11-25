@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cálculo de Números Perfectos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script type="text/javascript" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Cálculo de Números Perfectos</h1>
+
+        <!-- Enunciado con alerta -->
+        <div class="alert alert-info" role="alert">
+            <h4 class="alert-heading">¿Qué son los números perfectos?</h4>
+            <p>
+                Un <strong>número perfecto</strong> es un número entero positivo que es igual a la suma de sus divisores propios 
+                (excluyendo el número en sí mismo). Por ejemplo:
+            </p>
+            <ul>
+                <li><strong>6</strong> es un número perfecto porque sus divisores propios son <strong>1</strong>, <strong>2</strong>, y <strong>3</strong>, y \( 1 + 2 + 3 = 6 \).</li>
+                <li><strong>28</strong> también es un número perfecto, ya que \( 1 + 2 + 4 + 7 + 14 = 28 \).</li>
+            </ul>
+            <p>
+                Los números perfectos se calculan usando la fórmula 
+                \( N = 2^{p-1} \cdot (2^p - 1) \), donde \( 2^p - 1 \) debe ser un número primo 
+                (también conocido como un primo de Mersenne).
+            </p>
+            <p>
+                El límite \( p \) define hasta qué punto se realizan los cálculos.
+            </p>
+            <p>
+                Actualmente se conocen <strong>52 números perfectos</strong>. 
+                Puedes calcular algunos de ellos introduciendo un límite para \( p \) y presionando <strong>Calcular</strong>.
+            </p>
+            <hr>
+            <p class="text-danger">
+                Nota: Para valores grandes de \( p \), el cálculo puede ser muy lento. 
+                Por favor, ten paciencia si introduces valores mayores a 60.
+            </p>
+        </div>
+        
+        <!-- Formulario principal -->
+        <form method="POST" class="my-4">
+            <label for="limite" class="form-label">Introduce un límite para \( p \):</label>
+            <div class="mb-3">
+                <input type="number" class="form-control" id="limite" name="limite" placeholder="Por ejemplo, 10" required value="{{ limite }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Calcular</button>
+        </form>
+        
+        <!-- Mensaje de Error y botones para continuar o cancelar -->
+        {% if mensaje_error %}
+        <div class="alert alert-warning mt-3">
+            <p>{{ mensaje_error }}</p>
+            <form method="POST" class="d-flex gap-2">
+                <input type="hidden" name="limite" value="{{ limite }}">
+                <input type="hidden" name="continuar" value="true">
+                <button type="submit" class="btn btn-danger">Continuar de todos modos</button>
+                <button type="submit" class="btn btn-secondary" name="cancelar" value="true">Cancelar</button>
+            </form>
+        </div>
+        {% endif %}
+
+        <!-- Resultados -->
+        {% if numeros_perfectos %}
+        <h2 class="mt-5">Resultados</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Valor de \( p \)</th>
+                    <th scope="col">\( 2^p - 1 \) (Mersenne)</th>
+                    <th scope="col">¿Es primo?</th>
+                    <th scope="col">N.º Ordinal</th>
+                    <th scope="col">Número Perfecto</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for resultado in numeros_perfectos %}
+                <tr class="{{ 'table-success' if resultado.es_primo else '' }}">
+                    <td>{{ resultado.p }}</td>
+                    <td>{{ resultado.mersenne }}</td>
+                    <td>{{ "Sí" if resultado.es_primo else "No" }}</td>
+                    <td>{{ resultado.ordinal if resultado.ordinal else '' }}</td>
+                    <td>{{ resultado.numero_perfecto }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <form action="/export" method="POST" class="mt-4">
+            {% for resultado in numeros_perfectos %}
+            <input type="hidden" name="numeros_perfectos[]" value="{{ resultado.numero_perfecto if resultado.numero_perfecto != '-' }}">
+            {% endfor %}
+            <button type="submit" class="btn btn-success">Exportar Resultados a CSV</button>
+        </form>
+        {% endif %}
+        </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
